@@ -3,6 +3,7 @@
 #include <numeric>
 #include <cmath>
 #include <climits>
+#include <string_view>
 
 #include "config/regmatch.h"
 #include "generator/config/subexport.h"
@@ -230,6 +231,19 @@ void groupGenerate(const std::string &rule, std::vector<Proxy> &nodelist, string
     }
 }
 
+
+std::string StripIPv6Brackets(std::string_view host)
+{
+    if (host.size() >= 2 &&
+        host.front() == '[' &&
+        host.back() == ']' &&
+        host.find(':') != std::string_view::npos) {
+        return std::string(host.substr(1, host.size() - 2));
+    }
+
+    return std::string(host);
+}
+
 void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGroupConfigs &extra_proxy_group, bool clashR, extra_settings &ext)
 {
     YAML::Node proxies, original_groups;
@@ -279,7 +293,7 @@ void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGr
         scv.define(x.AllowInsecure);
 
         singleproxy["name"] = x.Remark;
-        singleproxy["server"] = x.Hostname;
+        singleproxy["server"] = StripIPv6Brackets(StripIPv6Brackets(x.Hostname));
         singleproxy["port"] = x.Port;
 
         if (!x.UnderlyingProxy.empty())
@@ -958,7 +972,7 @@ std::string proxyToSurge(std::vector<Proxy> &nodes, const std::string &base_conf
 
         processRemark(x.Remark, remarks_list);
 
-        std::string &hostname = x.Hostname, &username = x.Username, &password = x.Password, &method = x.EncryptMethod, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &edge = x.Edge, &path = x.Path, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam, &plugin = x.Plugin, &pluginopts = x.PluginOption, &underlying_proxy = x.UnderlyingProxy;
+        std::string &hostname = StripIPv6Brackets(StripIPv6Brackets(x.Hostname)), &username = x.Username, &password = x.Password, &method = x.EncryptMethod, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &edge = x.Edge, &path = x.Path, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam, &plugin = x.Plugin, &pluginopts = x.PluginOption, &underlying_proxy = x.UnderlyingProxy;
         std::string port = std::to_string(x.Port);
         bool &tlssecure = x.TLSSecure;
 
@@ -1258,7 +1272,7 @@ std::string proxyToSingle(std::vector<Proxy> &nodes, int types, extra_settings &
     for(Proxy &x : nodes)
     {
         std::string remark = x.Remark;
-        std::string &hostname = x.Hostname, &password = x.Password, &method = x.EncryptMethod, &plugin = x.Plugin, &pluginopts = x.PluginOption, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &path = x.Path, &faketype = x.FakeType;
+        std::string &hostname = StripIPv6Brackets(x.Hostname), &password = x.Password, &method = x.EncryptMethod, &plugin = x.Plugin, &pluginopts = x.PluginOption, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &path = x.Path, &faketype = x.FakeType;
         bool &tlssecure = x.TLSSecure;
         std::string port = std::to_string(x.Port);
         std::string aid = std::to_string(x.AlterId);
@@ -1348,7 +1362,7 @@ std::string proxyToSSSub(std::string base_conf, std::vector<Proxy> &nodes, extra
     for(Proxy &x : nodes)
     {
         std::string &remark = x.Remark;
-        std::string &hostname = x.Hostname;
+        std::string &hostname = StripIPv6Brackets(StripIPv6Brackets(x.Hostname));
         std::string &password = x.Password;
         std::string &method = x.EncryptMethod;
         std::string &plugin = x.Plugin;
@@ -1425,7 +1439,7 @@ void proxyToQuan(std::vector<Proxy> &nodes, INIReader &ini, std::vector<RulesetC
 
         processRemark(x.Remark, remarks_list);
 
-        std::string &hostname = x.Hostname, &method = x.EncryptMethod, &password = x.Password, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &path = x.Path, &edge = x.Edge, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam, &plugin = x.Plugin, &pluginopts = x.PluginOption, &username = x.Username;
+        std::string &hostname = StripIPv6Brackets(StripIPv6Brackets(x.Hostname)), &method = x.EncryptMethod, &password = x.Password, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &path = x.Path, &edge = x.Edge, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam, &plugin = x.Plugin, &pluginopts = x.PluginOption, &username = x.Username;
         std::string port = std::to_string(x.Port);
         bool &tlssecure = x.TLSSecure;
         tribool scv;
@@ -1659,7 +1673,7 @@ void proxyToQuanX(std::vector<Proxy> &nodes, INIReader &ini, std::vector<Ruleset
 
         processRemark(x.Remark, remarks_list);
 
-        std::string &hostname = x.Hostname, &method = x.EncryptMethod, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &path = x.Path, &password = x.Password, &plugin = x.Plugin, &pluginopts = x.PluginOption, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam, &username = x.Username, &uuid = x.UUID, &sni = x.SNI, &publickey = x.PublicKey, &shortid = x.ShortID, &flow = x.Flow;
+        std::string &hostname = StripIPv6Brackets(x.Hostname), &method = x.EncryptMethod, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &path = x.Path, &password = x.Password, &plugin = x.Plugin, &pluginopts = x.PluginOption, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam, &username = x.Username, &uuid = x.UUID, &sni = x.SNI, &publickey = x.PublicKey, &shortid = x.ShortID, &flow = x.Flow;
         std::string port = std::to_string(x.Port);
         bool &tlssecure = x.TLSSecure;
 
@@ -1989,7 +2003,7 @@ std::string proxyToSSD(std::vector<Proxy> &nodes, std::string &group, std::strin
 
     for(Proxy &x : nodes)
     {
-        std::string &hostname = x.Hostname, &password = x.Password, &method = x.EncryptMethod, &plugin = x.Plugin, &pluginopts = x.PluginOption, &protocol = x.Protocol, &obfs = x.OBFS;
+        std::string &hostname = StripIPv6Brackets(x.Hostname), &password = x.Password, &method = x.EncryptMethod, &plugin = x.Plugin, &pluginopts = x.PluginOption, &protocol = x.Protocol, &obfs = x.OBFS;
 
         switch(x.Type)
         {
@@ -2084,7 +2098,7 @@ void proxyToMellow(std::vector<Proxy> &nodes, INIReader &ini, std::vector<Rulese
 
         processRemark(x.Remark, remarks_list);
 
-        std::string &hostname = x.Hostname, port = std::to_string(x.Port);
+        std::string &hostname = StripIPv6Brackets(x.Hostname), port = std::to_string(x.Port);
 
         tfo = ext.tfo;
         scv = ext.skip_cert_verify;
@@ -2229,7 +2243,7 @@ std::string proxyToLoon(std::vector<Proxy> &nodes, const std::string &base_conf,
         }
         processRemark(x.Remark, remarks_list);
 
-        std::string &hostname = x.Hostname, &username = x.Username, &password = x.Password, &method = x.EncryptMethod, &plugin = x.Plugin, &pluginopts = x.PluginOption, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &path = x.Path, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam;
+        std::string &hostname = StripIPv6Brackets(x.Hostname), &username = x.Username, &password = x.Password, &method = x.EncryptMethod, &plugin = x.Plugin, &pluginopts = x.PluginOption, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &path = x.Path, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam;
         std::string port = std::to_string(x.Port), aid = std::to_string(x.AlterId);
         bool &tlssecure = x.TLSSecure;
 
@@ -2499,7 +2513,7 @@ static void addSingBoxCommonMembers(rapidjson::Value &proxy, const Proxy &x, con
 {
     proxy.AddMember("type", type, allocator);
     proxy.AddMember("tag", rapidjson::StringRef(x.Remark.c_str()), allocator);
-    proxy.AddMember("server", rapidjson::StringRef(x.Hostname.c_str()), allocator);
+    proxy.AddMember("server", rapidjson::StringRef(StripIPv6Brackets(x.Hostname).c_str()), allocator);
     proxy.AddMember("server_port", x.Port, allocator);
 }
 
@@ -2603,7 +2617,7 @@ void proxyToSingBox(std::vector<Proxy> &nodes, rapidjson::Document &json, std::v
                 proxy.AddMember("private_key", rapidjson::StringRef(x.PrivateKey.c_str()), allocator);
 
                 rapidjson::Value peer(rapidjson::kObjectType);
-                peer.AddMember("server", rapidjson::StringRef(x.Hostname.c_str()), allocator);
+                peer.AddMember("server", rapidjson::StringRef(StripIPv6Brackets(x.Hostname).c_str()), allocator);
                 peer.AddMember("server_port", x.Port, allocator);
                 peer.AddMember("public_key", rapidjson::StringRef(x.PublicKey.c_str()), allocator);
                 if (!x.PreSharedKey.empty())
