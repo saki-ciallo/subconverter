@@ -969,8 +969,9 @@ std::string proxyToSurge(std::vector<Proxy> &nodes, const std::string &base_conf
         }
 
         processRemark(x.Remark, remarks_list);
-
-        std::string &hostname = StripIPv6Brackets(x.Hostname), &username = x.Username, &password = x.Password, &method = x.EncryptMethod, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &edge = x.Edge, &path = x.Path, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam, &plugin = x.Plugin, &pluginopts = x.PluginOption, &underlying_proxy = x.UnderlyingProxy;
+        
+        std::string hostname = StripIPv6Brackets(x.Hostname);
+        std::string &username = x.Username, &password = x.Password, &method = x.EncryptMethod, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &edge = x.Edge, &path = x.Path, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam, &plugin = x.Plugin, &pluginopts = x.PluginOption, &underlying_proxy = x.UnderlyingProxy;
         std::string port = std::to_string(x.Port);
         bool &tlssecure = x.TLSSecure;
 
@@ -1270,7 +1271,8 @@ std::string proxyToSingle(std::vector<Proxy> &nodes, int types, extra_settings &
     for(Proxy &x : nodes)
     {
         std::string remark = x.Remark;
-        std::string &hostname = StripIPv6Brackets(x.Hostname), &password = x.Password, &method = x.EncryptMethod, &plugin = x.Plugin, &pluginopts = x.PluginOption, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &path = x.Path, &faketype = x.FakeType;
+        std::string hostname = StripIPv6Brackets(x.Hostname);
+        std::string &password = x.Password, &method = x.EncryptMethod, &plugin = x.Plugin, &pluginopts = x.PluginOption, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &path = x.Path, &faketype = x.FakeType;
         bool &tlssecure = x.TLSSecure;
         std::string port = std::to_string(x.Port);
         std::string aid = std::to_string(x.AlterId);
@@ -1360,7 +1362,7 @@ std::string proxyToSSSub(std::string base_conf, std::vector<Proxy> &nodes, extra
     for(Proxy &x : nodes)
     {
         std::string &remark = x.Remark;
-        std::string &hostname = StripIPv6Brackets(x.Hostname);
+        // std::string &hostname = StripIPv6Brackets(x.Hostname);
         std::string &password = x.Password;
         std::string &method = x.EncryptMethod;
         std::string &plugin = x.Plugin;
@@ -1368,6 +1370,7 @@ std::string proxyToSSSub(std::string base_conf, std::vector<Proxy> &nodes, extra
         std::string &protocol = x.Protocol;
         std::string &obfs = x.OBFS;
 
+        std::string hostname = StripIPv6Brackets(x.Hostname);
         switch(x.Type)
         {
         case ProxyType::Shadowsocks:
@@ -1437,7 +1440,8 @@ void proxyToQuan(std::vector<Proxy> &nodes, INIReader &ini, std::vector<RulesetC
 
         processRemark(x.Remark, remarks_list);
 
-        std::string &hostname = StripIPv6Brackets(x.Hostname), &method = x.EncryptMethod, &password = x.Password, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &path = x.Path, &edge = x.Edge, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam, &plugin = x.Plugin, &pluginopts = x.PluginOption, &username = x.Username;
+        std::string hostname = StripIPv6Brackets(x.Hostname);
+        std::string &method = x.EncryptMethod, &password = x.Password, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &path = x.Path, &edge = x.Edge, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam, &plugin = x.Plugin, &pluginopts = x.PluginOption, &username = x.Username;
         std::string port = std::to_string(x.Port);
         bool &tlssecure = x.TLSSecure;
         tribool scv;
@@ -1670,8 +1674,9 @@ void proxyToQuanX(std::vector<Proxy> &nodes, INIReader &ini, std::vector<Ruleset
         }
 
         processRemark(x.Remark, remarks_list);
-
-        std::string &hostname = StripIPv6Brackets(x.Hostname), &method = x.EncryptMethod, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &path = x.Path, &password = x.Password, &plugin = x.Plugin, &pluginopts = x.PluginOption, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam, &username = x.Username, &uuid = x.UUID, &sni = x.SNI, &publickey = x.PublicKey, &shortid = x.ShortID, &flow = x.Flow;
+        
+        std::string hostname = StripIPv6Brackets(x.Hostname);
+        std::string &method = x.EncryptMethod, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &path = x.Path, &password = x.Password, &plugin = x.Plugin, &pluginopts = x.PluginOption, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam, &username = x.Username, &uuid = x.UUID, &sni = x.SNI, &publickey = x.PublicKey, &shortid = x.ShortID, &flow = x.Flow;
         std::string port = std::to_string(x.Port);
         bool &tlssecure = x.TLSSecure;
 
@@ -2001,7 +2006,8 @@ std::string proxyToSSD(std::vector<Proxy> &nodes, std::string &group, std::strin
 
     for(Proxy &x : nodes)
     {
-        std::string &hostname = StripIPv6Brackets(x.Hostname), &password = x.Password, &method = x.EncryptMethod, &plugin = x.Plugin, &pluginopts = x.PluginOption, &protocol = x.Protocol, &obfs = x.OBFS;
+        std::string hostname = StripIPv6Brackets(x.Hostname);
+        std::string &password = x.Password, &method = x.EncryptMethod, &plugin = x.Plugin, &pluginopts = x.PluginOption, &protocol = x.Protocol, &obfs = x.OBFS;
 
         switch(x.Type)
         {
@@ -2095,8 +2101,9 @@ void proxyToMellow(std::vector<Proxy> &nodes, INIReader &ini, std::vector<Rulese
         }
 
         processRemark(x.Remark, remarks_list);
-
-        std::string &hostname = StripIPv6Brackets(x.Hostname), port = std::to_string(x.Port);
+        
+        std::string hostname = StripIPv6Brackets(x.Hostname);
+        std::string port = std::to_string(x.Port);
 
         tfo = ext.tfo;
         scv = ext.skip_cert_verify;
@@ -2240,8 +2247,9 @@ std::string proxyToLoon(std::vector<Proxy> &nodes, const std::string &base_conf,
             x.Remark = "[" + type + "] " + x.Remark;
         }
         processRemark(x.Remark, remarks_list);
-
-        std::string &hostname = StripIPv6Brackets(x.Hostname), &username = x.Username, &password = x.Password, &method = x.EncryptMethod, &plugin = x.Plugin, &pluginopts = x.PluginOption, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &path = x.Path, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam;
+        
+        std::string hostname = StripIPv6Brackets(x.Hostname);
+        std::string &username = x.Username, &password = x.Password, &method = x.EncryptMethod, &plugin = x.Plugin, &pluginopts = x.PluginOption, &id = x.UserId, &transproto = x.TransferProtocol, &host = x.Host, &path = x.Path, &protocol = x.Protocol, &protoparam = x.ProtocolParam, &obfs = x.OBFS, &obfsparam = x.OBFSParam;
         std::string port = std::to_string(x.Port), aid = std::to_string(x.AlterId);
         bool &tlssecure = x.TLSSecure;
 
