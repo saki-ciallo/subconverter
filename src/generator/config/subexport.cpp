@@ -242,6 +242,47 @@ std::string StripIPv6Brackets(const std::string& host)
     return host;
 }
 
+static std::string quoteYamlShortIdValues(const std::string &yaml)
+{
+    std::string quoted_yaml;
+    std::size_t line_begin = 0;
+
+    while(line_begin <= yaml.size())
+    {
+        std::size_t line_end = yaml.find('\n', line_begin);
+        std::string line = yaml.substr(line_begin, line_end == std::string::npos ? std::string::npos : line_end - line_begin);
+        std::size_t key_pos = line.find("short-id:");
+
+        if(key_pos != std::string::npos && (key_pos == 0 || line[key_pos - 1] == ' ' || line[key_pos - 1] == '{' || line[key_pos - 1] == ',' || line[key_pos - 1] == '['))
+        {
+            std::size_t value_pos = key_pos + std::string("short-id:").size();
+            while(value_pos < line.size() && (line[value_pos] == ' ' || line[value_pos] == '\t'))
+                value_pos++;
+
+            if(value_pos < line.size() && line[value_pos] != '"' && line[value_pos] != '\'')
+            {
+                std::size_t value_end = value_pos;
+                while(value_end < line.size() && line[value_end] != ' ' && line[value_end] != '\t' && line[value_end] != ',' && line[value_end] != '}')
+                    value_end++;
+
+                if(value_end > value_pos)
+                {
+                    line.insert(value_end, "\"");
+                    line.insert(value_pos, "\"");
+                }
+            }
+        }
+
+        quoted_yaml += line;
+        if(line_end == std::string::npos)
+            break;
+        quoted_yaml += '\n';
+        line_begin = line_end + 1;
+    }
+
+    return quoted_yaml;
+}
+
 void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGroupConfigs &extra_proxy_group, bool clashR, extra_settings &ext)
 {
     YAML::Node proxies, original_groups;
@@ -855,7 +896,7 @@ std::string proxyToClash(std::vector<Proxy> &nodes, const std::string &base_conf
     proxyToClash(nodes, yamlnode, extra_proxy_group, clashR, ext);
 
     if(ext.nodelist)
-        return YAML::Dump(yamlnode);
+        return quoteYamlShortIdValues(YAML::Dump(yamlnode));
 
     /*
     if(ext.enable_rule_generator)
@@ -864,7 +905,7 @@ std::string proxyToClash(std::vector<Proxy> &nodes, const std::string &base_conf
     return YAML::Dump(yamlnode);
     */
     if(!ext.enable_rule_generator)
-        return YAML::Dump(yamlnode);
+        return quoteYamlShortIdValues(YAML::Dump(yamlnode));
 
     if(!ext.managed_config_prefix.empty() || ext.clash_script)
     {
@@ -877,11 +918,11 @@ std::string proxyToClash(std::vector<Proxy> &nodes, const std::string &base_conf
         }
 
         renderClashScript(yamlnode, ruleset_content_array, ext.managed_config_prefix, ext.clash_script, ext.overwrite_original_rules, ext.clash_classical_ruleset);
-        return YAML::Dump(yamlnode);
+        return quoteYamlShortIdValues(YAML::Dump(yamlnode));
     }
 
     std::string output_content = rulesetToClashStr(yamlnode, ruleset_content_array, ext.overwrite_original_rules, ext.clash_new_field_name);
-    output_content.insert(0, YAML::Dump(yamlnode));
+    output_content.insert(0, quoteYamlShortIdValues(YAML::Dump(yamlnode)));
     //rulesetToClash(yamlnode, ruleset_content_array, ext.overwrite_original_rules, ext.clash_new_field_name);
     //std::string output_content = YAML::Dump(yamlnode);
 
@@ -1825,7 +1866,7 @@ void proxyToQuanX(std::vector<Proxy> &nodes, INIReader &ini, std::vector<Ruleset
                 {
                     proxyStr += ", reality-base64-pubkey=" + publickey;
                     if(!shortid.empty())
-                        proxyStr += ", reality-hex-shortid=" + shortid;
+                        proxyStr += ", reality-hex-shortid=\"" + shortid + "\"";
                 }
             }
             else if(transproto == "http")
@@ -1850,7 +1891,7 @@ void proxyToQuanX(std::vector<Proxy> &nodes, INIReader &ini, std::vector<Ruleset
                         proxyStr += ", obfs-host=" + sni;
                         proxyStr += ", reality-base64-pubkey=" + publickey;
                         if(!shortid.empty())
-                            proxyStr += ", reality-hex-shortid=" + shortid;
+                            proxyStr += ", reality-hex-shortid=\"" + shortid + "\"";
                         if(!flow.empty())
                             proxyStr += ", vless-flow=" + flow;
                     }
