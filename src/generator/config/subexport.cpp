@@ -901,7 +901,7 @@ std::string generatePeer(Proxy &node, bool client_id_as_reserved = false)
 std::string generatePeerLoon(Proxy &node, bool client_id_as_reserved = false)
 {
     std::string result;
-    result += "public-key = '" + node.PublicKey + "'";
+    result += "public-key = \"" + node.PublicKey + "\"";
     result += ", endpoint = " + node.Hostname + ":" + std::to_string(node.Port);
     if(!node.PreSharedKey.empty())
         result += ", preshared-key = " + node.PreSharedKey;
@@ -2308,7 +2308,7 @@ std::string proxyToLoon(std::vector<Proxy> &nodes, const std::string &base_conf,
             proxy = "wireguard, interface-ip=" + x.SelfIP;
             if(!x.SelfIPv6.empty())
                 proxy += ", interface-ipv6=" + x.SelfIPv6;
-            proxy += ", private-key='" + x.PrivateKey + "'";
+            proxy += ", private-key=\"" + x.PrivateKey + "\"";
             for(const auto &y : x.DnsServers)
             {
                 if(isIPv4(y))
