@@ -3,7 +3,6 @@
 #include <numeric>
 #include <cmath>
 #include <climits>
-#include <string_view>
 
 #include "config/regmatch.h"
 #include "generator/config/subexport.h"
@@ -232,16 +231,15 @@ void groupGenerate(const std::string &rule, std::vector<Proxy> &nodelist, string
 }
 
 
-std::string StripIPv6Brackets(std::string_view host)
+std::string StripIPv6Brackets(const std::string& host)
 {
     if (host.size() >= 2 &&
         host.front() == '[' &&
-        host.back() == ']' &&
-        host.find(':') != std::string_view::npos) {
-        return std::string(host.substr(1, host.size() - 2));
+        host.back() == ']') {
+        return host.substr(1, host.size() - 2);
     }
 
-    return std::string(host);
+    return host;
 }
 
 void proxyToClash(std::vector<Proxy> &nodes, YAML::Node &yamlnode, const ProxyGroupConfigs &extra_proxy_group, bool clashR, extra_settings &ext)
