@@ -898,6 +898,28 @@ std::string generatePeer(Proxy &node, bool client_id_as_reserved = false)
     return result;
 }
 
+std::string generatePeerLoon(Proxy &node, bool client_id_as_reserved = false)
+{
+    std::string result;
+    result += "public-key = '" + node.PublicKey + "'";
+    result += ", endpoint = " + node.Hostname + ":" + std::to_string(node.Port);
+    if(!node.PreSharedKey.empty())
+        result += ", preshared-key = " + node.PreSharedKey;
+    if(!node.AllowedIPs.empty())
+        result += ", allowed-ips = \"" + node.AllowedIPs + "\"";
+    if(node.KeepAlive > 0)
+        result += ", keepalive = " + std::to_string(node.KeepAlive);
+    if(!node.ClientId.empty())
+    {
+        if(client_id_as_reserved)
+            result += ", reserved = [" + node.ClientId + "]";
+        else
+            result += ", client-id = " + node.ClientId;
+    }
+    return result;
+}
+
+
 std::string proxyToSurge(std::vector<Proxy> &nodes, const std::string &base_conf, std::vector<RulesetContent> &ruleset_content_array, const ProxyGroupConfigs &extra_proxy_group, int surge_ver, extra_settings &ext)
 {
     INIReader ini;
@@ -2286,7 +2308,7 @@ std::string proxyToLoon(std::vector<Proxy> &nodes, const std::string &base_conf,
             proxy = "wireguard, interface-ip=" + x.SelfIP;
             if(!x.SelfIPv6.empty())
                 proxy += ", interface-ipv6=" + x.SelfIPv6;
-            proxy += ", private-key=" + x.PrivateKey;
+            proxy += ", private-key='" + x.PrivateKey + "'";
             for(const auto &y : x.DnsServers)
             {
                 if(isIPv4(y))
@@ -2298,7 +2320,7 @@ std::string proxyToLoon(std::vector<Proxy> &nodes, const std::string &base_conf,
                 proxy += ", mtu=" + std::to_string(x.Mtu);
             if(x.KeepAlive > 0)
                 proxy += ", keepalive=" + std::to_string(x.KeepAlive);
-            proxy += ", peers=[{" + generatePeer(x, true) + "}]";
+            proxy += ", peers=[{" + generatePeerLoon(x, true) + "}]";
             break;
         case ProxyType::Hysteria2:
             proxy = "hysteria2," + hostname + "," + port + ",\"" + password + "\"";
